@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "build": "echo \"No build step required for backend\"",
+    "build": "node scripts/install-chrome.js && echo \"No build step required for backend\"",
     "postinstall": "node scripts/postinstall.js"
   },
   "keywords": [],
