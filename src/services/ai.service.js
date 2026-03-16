@@ -149,9 +149,25 @@ ${JSON.stringify(z.toJSONSchema(interviewReportSchema))}`;
 };
 
 const generatePdfFromHtml = async (html) => {
+  let browser;
   try {
-    const browser = await puppeteer.launch();
+    const launchOptions = {
+      headless: true,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+      ],
+    };
+
+    if (process.env.PUPPETEER_EXECUTABLE_PATH) {
+      launchOptions.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
+    }
+
+    browser = await puppeteer.launch(launchOptions);
     const page = await browser.newPage();
+    page.setDefaultNavigationTimeout(45000);
     await page.setContent(html, { waitUntil: "networkidle0" });
     const pdfBuffer = await page.pdf({
       format: "A4",
@@ -163,11 +179,14 @@ const generatePdfFromHtml = async (html) => {
         left: "6mm",
       },
     });
-    await browser.close();
     return pdfBuffer;
   } catch (error) {
     console.error("Error generating PDF from HTML:", error);
     throw new Error("Failed to generate PDF from HTML");
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
   }
 };
 

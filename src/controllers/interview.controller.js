@@ -162,6 +162,9 @@ export const generateResumePdfController = async (req, res) => {
     res.send(pdfBuffer);
   } catch (error) {
     console.error("Error generating resume PDF:", error);
-    res.status(500).json({ message: "Internal server error" });
+    const message = /Failed to generate PDF from HTML/i.test(error?.message || "")
+      ? "Resume PDF generation failed on server. Please retry in a moment."
+      : "Internal server error";
+    res.status(500).json({ message });
   }
 };
