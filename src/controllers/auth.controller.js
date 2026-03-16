@@ -1,6 +1,6 @@
 import Blacklist from "../models/blacklist.model.js";
 import User from "../models/user.model.js";
-import { generateToken } from "../utils/lib.js";
+import { generateToken, getAuthCookieOptions } from "../utils/lib.js";
 
 export const registerUser = async (req, res) => {
   try {
@@ -85,11 +85,7 @@ export const logoutUser = async (req, res) => {
       });
     }
 
-    res.clearCookie("token", {
-      httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
-    });
+    res.clearCookie("token", getAuthCookieOptions());
 
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
